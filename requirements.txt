@@ -1,13 +1,8 @@
 torch>=1.10
 torchvision>=0.11
-Pillow>=9.0
-numpy>=1.20
-
-# Optional: for VLM report
 transformers>=4.50
 accelerate>=0.20
-
-# Optional: for API
-fastapi>=0.95
-uvicorn[standard]>=0.20
-python-multipart>=0.0.5
+medmnist>=2.2
+Pillow>=9.0
+numpy>=1.20
+huggingface_hub>=0.20
