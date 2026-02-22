@@ -1,30 +1,16 @@
-"""Task 3: paths and settings for integrated inference pipeline."""
-import os
-from pathlib import Path
+import torch
 
-# Hugging Face token for MedGemma (set here, or env HF_TOKEN, or --token when running)
-# Get token: https://huggingface.co/settings/tokens  |  Accept terms: https://huggingface.co/google/medgemma-4b-it
-HF_TOKEN = os.environ.get("HF_TOKEN", "")
+class Config:
+    seed = 42
+    batch_size = 64
+    num_epochs = 25
+    lr = 1e-3
+    weight_decay = 5e-4  # stronger regularization to reduce overfitting
+    num_workers = 2
+    early_stopping_patience = 5  # stop if val AUC does not improve for this many epochs
+    device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
-# CNN checkpoint: first path that exists is used. Set FUSION=1 to use two-model ensemble.
-CNN_MODEL_PATHS = [
-    Path("/content/resnet34_pneumonia.pth"),
-    Path("/content/pneumonia_net_pneumonia.pth"),
-    Path("/content/resnet18_pneumonia.pth"),
-    Path("/content/efficientnet_b0_pneumonia.pth"),
-    Path("resnet34_pneumonia.pth"),
-    Path("pneumonia_net_pneumonia.pth"),
-    Path("resnet18_pneumonia.pth"),
-    Path("efficientnet_b0_pneumonia.pth"),
-    Path(__file__).resolve().parent.parent / "Pneumonia_Task1" / "venv" / "Scripts" / "chleng" / "resnet34_pneumonia.pth",
-    Path(__file__).resolve().parent.parent / "Pneumonia_Task1" / "venv" / "Scripts" / "chleng" / "pneumonia_net_pneumonia.pth",
-    Path(__file__).resolve().parent.parent / "Pneumonia_Task1" / "venv" / "Scripts" / "chleng" / "resnet18_pneumonia.pth",
-]
-FUSION_PATHS = [
-    (Path("/content/resnet34_pneumonia.pth"), Path("/content/resnet18_pneumonia.pth")),
-    (Path("resnet34_pneumonia.pth"), Path("resnet18_pneumonia.pth")),
-]
-
-VLM_MODEL_ID = "google/medgemma-4b-it"
-IMAGE_SIZE_CNN = 28   # PneumoniaMNIST size
-IMAGE_SIZE_VLM = 224  # MedGemma input
+    # Model selection: resnet18, resnet34, resnet50, efficientnet_b0, vgg16, custom_cnn, pneumonia_net
+    # pneumonia_net = custom residual model (no pretrained). Use ensemble_evaluate.py for fusion of two models.
+    model_name = "pneumonia_net"
+    model_save_path = f"{model_name}_pneumonia.pth"
